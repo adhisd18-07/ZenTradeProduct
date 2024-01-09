@@ -1,31 +1,23 @@
-const apiUrl = 'https://s3.amazonaws.com/open-to-cors/assignment.json';
+fetch('https://s3.amazonaws.com/open-to-cors/assignment.json')
+  .then(response => response.json())
+  .then(data => {
+    const products = Object.values(data.products);
 
-async function fetchProducts() {
-    try {
-        const response = await fetch(apiUrl);
-        const data = await response.json();
-        return data.products.map(product => product.product);
-    } catch (error) {
-        console.error('Error fetching data:', error);
-        return [];
-    }
-}
+    products.sort((a, b) => parseInt(b.popularity) - parseInt(a.popularity));
 
-function displayProducts(products) {
-    const container = document.getElementById('product-container');
-    container.innerHTML = '';
+    const productsListDiv = document.getElementById('productsList');
 
-    products
-        .sort((a, b) => b.popularity - a.popularity)
-        .forEach(product => {
-            const productDiv = document.createElement('div');
-            productDiv.className = 'product';
-            productDiv.innerHTML = `
-                <h2>${product.title}</h2>
-                <p>Price: ${product.price}</p>
-            `;
-            container.appendChild(productDiv);
-        });
-}
-
-fetchProducts().then(displayProducts);
+    products.forEach(product => {
+      const productDiv = document.createElement('div');
+      productDiv.classList.add('product');
+      productDiv.innerHTML = `
+        <h3>${product.title}</h3>
+        <p>Price: $${product.price}</p>
+        <p>Popularity: ${product.popularity}</p>
+      `;
+      productsListDiv.appendChild(productDiv);
+    });
+  })
+  .catch(error => {
+    console.error('Error fetching data:', error);
+  });
